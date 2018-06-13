@@ -1,12 +1,12 @@
 var mongodb = require('mongodb');
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
-var url = 'mongodb://localhost:27017/Blog';
+var url = 'mongodb://localhost:27017/b03901095_Blog';
  
 module.exports = {
     addPost: function(title, subject, callback){
         MongoClient.connect(url, function(err, db) {
-            const myDb = db.db('Blog');
+            const myDb = db.db('b03901095_Blog');
             myDb.collection('post').insertOne( {
                 "title": title,
                 "subject": subject
@@ -24,7 +24,7 @@ module.exports = {
     },
     getPost: function(callback){
         MongoClient.connect(url, function(err, db){
-            const myDb = db.db('Blog');
+            const myDb = db.db('b03901095_Blog');
             myDb.collection('post', function (err, collection) {
                 collection.find().toArray(function (err, list) {
                     callback(list);
@@ -34,7 +34,7 @@ module.exports = {
     },
     getPostWithId: function(id, callback){
         MongoClient.connect(url, function(err, db){
-            const myDb = db.db('Blog');
+            const myDb = db.db('b03901095_Blog');
             myDb.collection('post').findOne({
                 _id: new mongodb.ObjectID(id)
              },
@@ -52,7 +52,7 @@ module.exports = {
     },
     updatePost: function(id, title, subject, callback){
         MongoClient.connect(url, function(err, db) {
-            const myDb = db.db('Blog');
+            const myDb = db.db('b03901095_Blog');
             myDb.collection('post').updateOne( 
                 { "_id": new mongodb.ObjectID(id) },
                 { $set: 
@@ -73,7 +73,7 @@ module.exports = {
     },
     deletePost: function(id, callback){
         MongoClient.connect(url, function(err, db){
-            const myDb = db.db('Blog');
+            const myDb = db.db('b03901095_Blog');
              myDb.collection('post').deleteOne({
                 _id: new mongodb.ObjectID(id)
              },
