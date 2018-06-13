@@ -21,11 +21,12 @@ module.exports = {
             const myDb = db.db('Blog'); 
             myDb.collection('user').findOne( { email : username ,password: password 
             },function(err, result){
+                console.log("user.js 25", result);
                 if(result==null){
                     callback(false)
                 }
                 else{
-                    callback(true)
+                    callback(result)
                 }
             });
         });

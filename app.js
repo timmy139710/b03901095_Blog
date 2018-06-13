@@ -18,16 +18,16 @@ app.listen(7777,function(){
 
 app.post('/signin', function (req, res) {
     sessions=req.session;
-    var user_name=req.body.email;
+    var user_email=req.body.email;
     var password=req.body.password;
-    user.validateSignIn(user_name,password,function(result){
+    user.validateSignIn(user_email,password,function(result){
       if(result){
-        sessions.username = user_name;
-        console.log(user_name);
-        res.write(user_name);
+        sessions.email = user_email;
+        sessions.name = result.name;
+        sessions.password =password;
+        console.log(user_email);
+        res.write(result.name);
         res.end();
-        console.log(res);
-        // res.send('Success');
       }
       else{
         res.send('Wrong username password')
@@ -50,6 +50,11 @@ app.post('/signup', function (req, res) {
 
 });
 
+app.post('/signOut', function (req, res){
+  sessions=[];
+  res.send('Success');
+})
+
 app.post('/addPost', function (req, res) {
     var title = req.body.title;
     var subject = req.body.subject;
@@ -68,9 +73,18 @@ app.post('/addPost', function (req, res) {
   })
 
 app.post('/getPost', function (req, res) {
+    console.log(sessions);
+    console.log(req.body.name);
+    var req_name = req.body.name;
+
+    //handle unauthorized log in
     post.getPost(function(result){
-      if(sessions && sessions.username)
+      console.log(result);
+      if(sessions && (sessions.name === req_name))
         res.send(result);
+      else if(req_name === 'guest'){
+        res.send(result);
+      }
       else 
         res.send('unauthorized');
     });

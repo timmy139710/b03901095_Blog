@@ -7,11 +7,12 @@ class ShowPost extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      posts:[], 
+      posts:[],  
       username:'',
+      guestvisit: false,
     };
-    this.updatePost = this.updatePost.bind(this);
-    this.deletePost = this.deletePost.bind(this);
+    // this.updatePost = this.updatePost.bind(this);
+    // this.deletePost = this.deletePost.bind(this);
     this.getPost = this.getPost.bind(this);
     this.addPost = this.addPost.bind(this);
   }
@@ -25,8 +26,10 @@ class ShowPost extends React.Component {
     var self = this;
     var name = this.props.params.name;
     axios.post('/getPost', {
+      name: this.props.params.name,
     })
     .then(function (response) {
+      console.log(response);
       if(response.data==='unauthorized'){
         alert('Please log in');
         hashHistory.push('/');
@@ -35,6 +38,9 @@ class ShowPost extends React.Component {
         console.log('res is ',response);
         self.setState({posts: response.data});
         self.setState({username: name});
+        if(name === 'guest' || name === 'Guest'){
+          self.setState({ guestvisit: true });
+        }
       } 
     })
     .catch(function (error) {
@@ -69,6 +75,17 @@ class ShowPost extends React.Component {
     hashHistory.push('/home/'+ name + '/addPost/');
   }
 
+  returnHome(){
+    hashHistory.push('/');
+    axios.post('/signOut', {
+    })
+    .then(function (response) {
+      console.log('Successfully logged out');
+    })
+    .catch(function (error) {
+      console.log('error is ',error);
+    });
+  }
   render() {
     return (
       <div>
@@ -78,9 +95,9 @@ class ShowPost extends React.Component {
               {/* <li role="presentation" id="homeHyperlink" className="active"><a href="#">Home</a></li>
               <li role="presentation" id="addHyperLink" onClick={this.addPost}><a> Add </a> </li>
               <li role="presentation"><a href="#">Logout</a></li> */}
-              <button type="button" id="homeHyperlink" className="btn btn-primary">Home</button>
-              <button type="button" id="addHyperLink"  className="btn btn-primary" onClick={this.addPost}>Add</button>
-              <button type="button" id="" className="btn btn-default" >Logout</button>
+              <button type="button" id="homeHyperlink" className="btn btn-primary" >Home</button>
+              <button type="button" id="addHyperLink"  className="btn btn-primary" onClick={this.addPost} disabled={this.state.guestvisit}>Add</button>
+              <button type="button" id="" className="btn btn-default" onClick={this.returnHome.bind(this)}>Logout</button>
             </ul>
           </nav>
             <h3 className="text-muted">React Blog App</h3>
@@ -91,7 +108,6 @@ class ShowPost extends React.Component {
             <tr>
               <th>#</th>
               <th>Title</th>
-              {/* <th>Subject</th> */}
               <th>Edit</th>
               <th>Delete</th>
             </tr>
@@ -102,15 +118,14 @@ class ShowPost extends React.Component {
                  return <tr key={index} >
                           <td>{index+1}</td>
                           <td>{post.title}</td>
-                          {/* <td>{post.subject}</td> */}
                           <td>
-                            <button type="button" className="btn btn-default">
-                              <span onClick={this.updatePost.bind(this,post._id)} className="glyphicon glyphicon-pencil"></span>
+                            <button type="button" className="btn btn-default" disabled={this.state.guestvisit} onClick={this.updatePost.bind(this,post._id)}>
+                              <span className="glyphicon glyphicon-pencil" ></span>
                             </button>
                           </td>
                           <td>
-                            <button type="button" className="btn btn-default">
-                              <span onClick={this.deletePost.bind(this,post._id)} className="glyphicon glyphicon-remove"></span>
+                            <button type="button" className="btn btn-default" disabled={this.state.guestvisit} onClick={this.deletePost.bind(this,post._id)}>
+                              <span className="glyphicon glyphicon-remove" ></span>
                             </button>
                           </td>
                         </tr>
@@ -148,7 +163,7 @@ class AddPost extends React.Component {
     this.getPostWithId = this.getPostWithId.bind(this);
   }
   componentDidMount(){
-    document.getElementById('addHyperLink').className = "disabled btn btn-primary ";
+    document.getElementById('addHyperLink').className = "active disabled btn btn-primary ";
     document.getElementById('homeHyperlink').className = "btn btn-default";
     this.getPostWithId();
   }
@@ -196,14 +211,16 @@ class AddPost extends React.Component {
       console.log('error is ',error);
     });
   }
-
+  returnPage(){
+    hashHistory.push('/home/' + this.state.username);
+  }
   render() {
     return (
       <div>
         <div className="header clearfix">
           <nav>
             <ul className="nav nav-pills pull-right">
-            <button type="button" id="homeHyperlink" className="btn btn-primary">Home</button>
+              <button type="button" id="homeHyperlink" className="btn btn-primary" onClick={this.returnPage.bind(this)}>Home</button>
               <button type="button" id="addHyperLink"  className="btn btn-primary" >Add</button>
               <button type="button" id="" className="btn btn-default" >Logout</button>
             </ul>
@@ -256,7 +273,6 @@ class Signin extends React.Component {
           })
           .then(function (response) {
             console.log(response);
-            console.log(response.config.data);
             if(response.data !== 'Wrong username password'){
                 // window.location.assign('http://localhost:7777/home/')
               hashHistory.push('/home/' + response.data);
@@ -266,19 +282,28 @@ class Signin extends React.Component {
             console.log(error);
           });
     }
+    gotoSignUp(){
+      hashHistory.push('signUp');
+    }
+    guestVisit(){
+      hashHistory.push('/home/guest')
+    }
     render() {
         return (
         <div>
             <form className="form-signin">
-                <h2 className="form-signin-heading"> Please sign in </h2>
+                <h2 className="form-signin-heading"> Please sign in</h2>
                 <label for="inputEmail" className="sr-only">Email address</label>
                 <input type="email" onChange={this.handleEmailChange} id="inputEmail" className="form-control" placeholder="Email address" required autofocus />
                 <label for="inputPassword" className="sr-only">Password</label>
                 <input type="password" onChange={this.handlePasswordChange} id="inputPassword" className="form-control" placeholder="Password" required />                
                 <button className="btn btn-lg btn-primary btn-block" onClick={this.signIn} type="button">Sign in</button>
             </form>
+            <form>
+                <button type="button" className="btn btn-success btn-block btn-lg" onClick={this.gotoSignUp.bind(this)}>Sign up</button>
+            </form>
             <div>
-                <Link to="/signup">{'Signup    '}</Link>
+                <button type="button" className="btn btn-default" onClick={this.guestVisit.bind(this)}>Guest Visit</button>
                 {/* <Link to="/home/guest">{' Guest log in'}</Link> */}
             </div>
         </div>
@@ -322,6 +347,9 @@ class Signup extends React.Component{
         console.log(error);
       });
     }
+    gotoSignIn(){
+      hashHistory.push('/');
+    }
     render() {
         return (
           <div>
@@ -337,11 +365,8 @@ class Signup extends React.Component{
               <button className="btn btn-lg btn-primary btn-block" onClick={this.signUp} type="button">Sign up</button>
             </form>
             <div>
-              <Link to="/">{'Signin'}</Link>
+              <button className="btn btn-success" onClick={this.gotoSignIn.bind(this)}>Back</button>
             </div>
-            {/* <Button variant="contained" color="primary">
-                Hell World
-            </Button> */}
           </div>
           
         )
