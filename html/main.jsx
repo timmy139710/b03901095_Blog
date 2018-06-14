@@ -2,7 +2,7 @@ var Router = window.ReactRouter.Router;
 var Route = window.ReactRouter.Route;
 var hashHistory = window.ReactRouter.hashHistory;
 var Link = window.ReactRouter.Link;
-// import Button from '@material-ui/core/Button';
+
 class ShowPost extends React.Component {
   constructor(props) {
     super(props);
@@ -11,15 +11,11 @@ class ShowPost extends React.Component {
       username:'',
       guestvisit: false,
     };
-    // this.updatePost = this.updatePost.bind(this);
-    // this.deletePost = this.deletePost.bind(this);
     this.getPost = this.getPost.bind(this);
     this.addPost = this.addPost.bind(this);
   }
   componentDidMount(){
     this.getPost();
-    document.getElementById('homeHyperlink').className = "active btn btn-primary";
-    document.getElementById('addHyperLink').className = "btn btn-default";
   }
 
   getPost(){
@@ -52,7 +48,6 @@ class ShowPost extends React.Component {
     console.log('update post', id);
     var name = this.state.username;
     hashHistory.push('/home/'+ name +'/addPost/' + id);
-    // hashHistory.push('/home/addPost/' + id + '/' + name);
   }
 
   deletePost(id){
@@ -92,15 +87,12 @@ class ShowPost extends React.Component {
         <div className="header clearfix">
           <nav>
             <ul className="nav nav-pills pull-right">
-              {/* <li role="presentation" id="homeHyperlink" className="active"><a href="#">Home</a></li>
-              <li role="presentation" id="addHyperLink" onClick={this.addPost}><a> Add </a> </li>
-              <li role="presentation"><a href="#">Logout</a></li> */}
-              <button type="button" id="homeHyperlink" className="btn btn-primary" >Home</button>
-              <button type="button" id="addHyperLink"  className="btn btn-primary" onClick={this.addPost} disabled={this.state.guestvisit}>Add</button>
+              <button type="button" id="homeHyperlink" className="active disabled btn btn-primary" >Home</button>
+              <button type="button" id="addHyperLink"  className="btn btn-default" onClick={this.addPost} disabled={this.state.guestvisit}>Add</button>
               <button type="button" id="" className="btn btn-default" onClick={this.returnHome.bind(this)}>Logout</button>
             </ul>
           </nav>
-            <h3 className="text-muted">React Blog App</h3>
+            <h3 className="text-primary">React Blog App</h3>
             <p className="bg-success text-center ">Current User: <strong className="">{this.state.username}</strong></p>
         </div>
         <table className="table table-striped">
@@ -137,7 +129,7 @@ class ShowPost extends React.Component {
         {
               this.state.posts.map(function(post,index) {
                  return <a key={index} className="list-group-item active">
-                          <h4 className="list-group-item-heading">{post.title}</h4>
+                          <h3 className="list-group-item-heading">{post.title}</h3>
                           <p className="list-group-item-text">{post.subject}</p>
                         </a>
               })
@@ -163,8 +155,6 @@ class AddPost extends React.Component {
     this.getPostWithId = this.getPostWithId.bind(this);
   }
   componentDidMount(){
-    document.getElementById('addHyperLink').className = "active disabled btn btn-primary ";
-    document.getElementById('homeHyperlink').className = "btn btn-default";
     this.getPostWithId();
   }
 
@@ -214,15 +204,27 @@ class AddPost extends React.Component {
   returnPage(){
     hashHistory.push('/home/' + this.state.username);
   }
+  returnHome(){
+    hashHistory.push('/');
+    axios.post('/signOut', {
+    })
+    .then(function (response) {
+      console.log('Successfully logged out');
+    })
+    .catch(function (error) {
+      console.log('error is ',error);
+    });
+  }
+
   render() {
     return (
       <div>
         <div className="header clearfix">
           <nav>
             <ul className="nav nav-pills pull-right">
-              <button type="button" id="homeHyperlink" className="btn btn-primary" onClick={this.returnPage.bind(this)}>Home</button>
-              <button type="button" id="addHyperLink"  className="btn btn-primary" >Add</button>
-              <button type="button" id="" className="btn btn-default" >Logout</button>
+              <button type="button" id="homeHyperlink" className="btn btn-default" onClick={this.returnPage.bind(this)}>Home</button>
+              <button type="button" id="addHyperLink"  className="active disabled btn btn-primary" >Add</button>
+              <button type="button" id="" className="btn btn-default" onClick={this.returnHome.bind(this)}>Logout</button>
             </ul>
           </nav>
         <h3 className="text-muted">React Blog App</h3>
@@ -274,7 +276,6 @@ class Signin extends React.Component {
           .then(function (response) {
             console.log(response);
             if(response.data !== 'Wrong username password'){
-                // window.location.assign('http://localhost:7777/home/')
               hashHistory.push('/home/' + response.data);
             }
           })
@@ -304,7 +305,6 @@ class Signin extends React.Component {
             </form>
             <div>
                 <button type="button" className="btn btn-default" onClick={this.guestVisit.bind(this)}>Guest Visit</button>
-                {/* <Link to="/home/guest">{' Guest log in'}</Link> */}
             </div>
         </div>
         )

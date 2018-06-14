@@ -23,7 +23,7 @@ module.exports = {
               email : username,
               password: password, 
             },function(err, result){
-                console.log("user.js 25", result);
+                console.log("User signed in", result);
                 if(result==null){
                     callback(false)
                 }

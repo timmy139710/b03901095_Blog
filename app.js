@@ -73,13 +73,11 @@ app.post('/addPost', function (req, res) {
   })
 
 app.post('/getPost', function (req, res) {
-    console.log(sessions);
     console.log(req.body.name);
     var req_name = req.body.name;
 
     //handle unauthorized log in
     post.getPost(function(result){
-      console.log(result);
       if(sessions && (sessions.name === req_name))
         res.send(result);
       else if(req_name === 'guest'){
@@ -94,7 +92,6 @@ app.post('/getPostWithId', function(req,res){
     var id = req.body.id;
     console.log('getPostWithId id: ', id);
     post.getPostWithId(id, function(result){
-      console.log(result);
       res.send(result)
     })
   })
